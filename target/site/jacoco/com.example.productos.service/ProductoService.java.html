@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">producto-app</a> &gt; <a href="index.source.html" class="el_package">com.example.productos.service</a> &gt; <span class="el_source">ProductoService.java</span></div><h1>ProductoService.java</h1><pre class="source lang-java linenums">package com.example.productos.service;
+
+import com.example.productos.model.Producto;
+import com.example.productos.repository.ProductoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Servicio con la lógica de negocio para la gestión de {@link Producto}.
+ * Todas las operaciones de escritura son transaccionales.
+ */
+@Service
+@Transactional(readOnly = true)
+public class ProductoService {
+
+    private final ProductoRepository productoRepository;
+
+<span class="fc" id="L22">    public ProductoService(ProductoRepository productoRepository) {</span>
+<span class="fc" id="L23">        this.productoRepository = productoRepository;</span>
+<span class="fc" id="L24">    }</span>
+
+    // ==================== Operaciones de Lectura ====================
+
+    /**
+     * Obtiene todos los productos registrados en el sistema.
+     *
+     * @return lista de todos los productos
+     */
+    public List&lt;Producto&gt; obtenerTodos() {
+<span class="fc" id="L34">        return productoRepository.findAll();</span>
+    }
+
+    /**
+     * Obtiene solo los productos activos.
+     *
+     * @return lista de productos activos
+     */
+    public List&lt;Producto&gt; obtenerActivos() {
+<span class="nc" id="L43">        return productoRepository.findByActivo(true);</span>
+    }
+
+    /**
+     * Busca un producto por su ID.
+     *
+     * @param id identificador del producto
+     * @return Optional con el producto si existe
+     */
+    public Optional&lt;Producto&gt; obtenerPorId(Long id) {
+<span class="fc" id="L53">        return productoRepository.findById(id);</span>
+    }
+
+    /**
+     * Busca productos por categoría.
+     *
+     * @param categoria nombre de la categoría
+     * @return lista de productos en esa categoría
+     */
+    public List&lt;Producto&gt; obtenerPorCategoria(String categoria) {
+<span class="nc" id="L63">        return productoRepository.findByCategoria(categoria);</span>
+    }
+
+    /**
+     * Busca productos cuyo nombre contenga el texto indicado.
+     *
+     * @param nombre texto a buscar
+     * @return lista de productos que coinciden
+     */
+    public List&lt;Producto&gt; buscarPorNombre(String nombre) {
+<span class="nc" id="L73">        return productoRepository.findByNombreContainingIgnoreCase(nombre);</span>
+    }
+
+    /**
+     * Busca productos en un rango de precio.
+     *
+     * @param precioMin precio mínimo
+     * @param precioMax precio máximo
+     * @return lista de productos en el rango
+     */
+    public List&lt;Producto&gt; obtenerPorRangoPrecio(BigDecimal precioMin, BigDecimal precioMax) {
+<span class="pc bpc" id="L84" title="1 of 4 branches missed.">        if (precioMin == null || precioMax == null) {</span>
+<span class="fc" id="L85">            throw new IllegalArgumentException(&quot;Los precios minimo y maximo son obligatorios&quot;);</span>
+        }
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (precioMin.compareTo(precioMax) &gt; 0) {</span>
+<span class="fc" id="L88">            throw new IllegalArgumentException(&quot;El precio minimo no puede ser mayor que el precio maximo&quot;);</span>
+        }
+<span class="fc" id="L90">        return productoRepository.findByPrecioBetween(precioMin, precioMax);</span>
+    }
+
+    /**
+     * Obtiene productos con stock por debajo del umbral indicado.
+     *
+     * @param umbral cantidad mínima de stock
+     * @return lista de productos con stock bajo
+     */
+    public List&lt;Producto&gt; obtenerConStockBajo(Integer umbral) {
+<span class="pc bpc" id="L100" title="1 of 4 branches missed.">        if (umbral == null || umbral &lt; 0) {</span>
+<span class="fc" id="L101">            throw new IllegalArgumentException(&quot;El umbral de stock debe ser un valor positivo&quot;);</span>
+        }
+<span class="fc" id="L103">        return productoRepository.findProductosConStockBajo(umbral);</span>
+    }
+
+    // ==================== Operaciones de Escritura ====================
+
+    /**
+     * Crea un nuevo producto en el sistema.
+     *
+     * @param producto datos del nuevo producto
+     * @return el producto creado con su ID asignado
+     * @throws IllegalArgumentException si ya existe un producto con el mismo nombre
+     */
+    @Transactional
+    public Producto crear(Producto producto) {
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        if (productoRepository.existsByNombreIgnoreCase(producto.getNombre())) {</span>
+<span class="fc" id="L118">            throw new IllegalArgumentException(</span>
+<span class="fc" id="L119">                    &quot;Ya existe un producto con el nombre: &quot; + producto.getNombre());</span>
+        }
+<span class="fc" id="L121">        return productoRepository.save(producto);</span>
+    }
+
+    /**
+     * Actualiza los datos de un producto existente.
+     *
+     * @param id      identificador del producto a actualizar
+     * @param updated datos actualizados
+     * @return el producto actualizado
+     * @throws java.util.NoSuchElementException si el producto no existe
+     */
+    @Transactional
+    public Producto actualizar(Long id, Producto updated) {
+<span class="fc" id="L134">        Producto existente = productoRepository.findById(id)</span>
+<span class="fc" id="L135">                .orElseThrow(() -&gt; new java.util.NoSuchElementException(</span>
+                        &quot;Producto no encontrado con id: &quot; + id));
+
+        // Verificar nombre duplicado solo si cambió
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (!existente.getNombre().equalsIgnoreCase(updated.getNombre())</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">                &amp;&amp; productoRepository.existsByNombreIgnoreCase(updated.getNombre())) {</span>
+<span class="nc" id="L141">            throw new IllegalArgumentException(</span>
+<span class="nc" id="L142">                    &quot;Ya existe un producto con el nombre: &quot; + updated.getNombre());</span>
+        }
+
+<span class="fc" id="L145">        existente.setNombre(updated.getNombre());</span>
+<span class="fc" id="L146">        existente.setDescripcion(updated.getDescripcion());</span>
+<span class="fc" id="L147">        existente.setPrecio(updated.getPrecio());</span>
+<span class="fc" id="L148">        existente.setStock(updated.getStock());</span>
+<span class="fc" id="L149">        existente.setCategoria(updated.getCategoria());</span>
+<span class="fc" id="L150">        existente.setActivo(updated.isActivo());</span>
+
+<span class="fc" id="L152">        return productoRepository.save(existente);</span>
+    }
+
+    /**
+     * Actualiza únicamente el stock de un producto.
+     *
+     * @param id       identificador del producto
+     * @param cantidad nuevo valor del stock
+     * @return el producto con stock actualizado
+     */
+    @Transactional
+    public Producto actualizarStock(Long id, Integer cantidad) {
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        if (cantidad &lt; 0) {</span>
+<span class="fc" id="L165">            throw new IllegalArgumentException(&quot;El stock no puede ser negativo&quot;);</span>
+        }
+<span class="fc" id="L167">        Producto producto = productoRepository.findById(id)</span>
+<span class="pc" id="L168">                .orElseThrow(() -&gt; new java.util.NoSuchElementException(</span>
+                        &quot;Producto no encontrado con id: &quot; + id));
+<span class="fc" id="L170">        producto.setStock(cantidad);</span>
+<span class="fc" id="L171">        return productoRepository.save(producto);</span>
+    }
+
+    /**
+     * Elimina (desactiva) un producto de forma lógica.
+     *
+     * @param id identificador del producto
+     * @throws java.util.NoSuchElementException si el producto no existe
+     */
+    @Transactional
+    public void eliminar(Long id) {
+<span class="fc" id="L182">        Producto producto = productoRepository.findById(id)</span>
+<span class="fc" id="L183">                .orElseThrow(() -&gt; new java.util.NoSuchElementException(</span>
+                        &quot;Producto no encontrado con id: &quot; + id));
+<span class="fc" id="L185">        producto.setActivo(false);</span>
+<span class="fc" id="L186">        productoRepository.save(producto);</span>
+<span class="fc" id="L187">    }</span>
+
+    /**
+     * Elimina permanentemente un producto de la base de datos.
+     *
+     * @param id identificador del producto
+     * @throws java.util.NoSuchElementException si el producto no existe
+     */
+    @Transactional
+    public void eliminarFisicamente(Long id) {
+<span class="nc bnc" id="L197" title="All 2 branches missed.">        if (!productoRepository.existsById(id)) {</span>
+<span class="nc" id="L198">            throw new java.util.NoSuchElementException(&quot;Producto no encontrado con id: &quot; + id);</span>
+        }
+<span class="nc" id="L200">        productoRepository.deleteById(id);</span>
+<span class="nc" id="L201">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
