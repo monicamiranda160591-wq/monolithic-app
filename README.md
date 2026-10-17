@@ -209,42 +209,9 @@ Definidas centralizadamente en la sección `environment` del `Jenkinsfile`:
 
 ---
 
-## ✅ Verificación de la Publicación del Artefacto
-
-Para comprobar que el JAR fue publicado exitosamente en Artifactory, se pueden emplear dos métodos:
-
-### Método 1: Verificación gráfica en Artifactory Web UI
-
-1. Iniciar sesión en Artifactory (`http://<IP_O_HOST_ARTIFACTORY>:8082`).
-2. Navegar a **Application → Artifactory → Artifacts**.
-3. Expandir el árbol de repositorios y ubicar:
-   ```
-   libs-release-local/
-   └── com/
-       └── example/
-           └── producto-app/
-               └── <BUILD_NUMBER>/
-                   ├── producto-app-1.0.0-SNAPSHOT.jar
-                   └── producto-app-1.0.0-SNAPSHOT.pom (si aplica)
-   ```
-4. Seleccionar el archivo JAR y verificar la pestaña **General Info** (tamaño en bytes, Checksum SHA-256, fecha de subida) y la pestaña **Builds** asociada al número de build de Jenkins.
-
-### Método 2: Verificación por API REST / cURL
-
-Ejecutar la consulta autenticada al endpoint de almacenamiento:
-
-```bash
-curl -u <USUARIO>:<PASSWORD> \
-  -X GET "http://<IP_O_HOST_ARTIFACTORY>:8082/artifactory/api/storage/libs-release-local/com/example/producto-app/<BUILD_NUMBER>/producto-app-1.0.0-SNAPSHOT.jar"
-```
-
-Una respuesta HTTP `200 OK` con el JSON de metadatos del archivo confirma la correcta publicación.
-
----
 
 ## 📸 Guía de Ejecución Local y Generación de Evidencias
 
-Para armar el informe de evidencias solicitado para la entrega del proyecto:
 
 ### 1. Evidencia de Compilación y Pruebas Unitarias (Build & Testing)
 
@@ -256,8 +223,8 @@ mvn clean verify
 
 **Capturas requeridas:**
 
-![IMagen](images/imagen1.jpg)
-![IMagen](images/imagen2.jpg)
+![Imagen1](images/imagen1.png)
+![Imagen2](images/imagen2.png)
 
 ### 2. Evidencia de Análisis Estático (SonarQube)
 
@@ -268,9 +235,16 @@ mvn sonar:sonar \
 ```
 
 **Capturas requeridas:**
-![IMagen](images/imagen_sq1.jpg)
+![Imagen_sq1](images/imagen_sq1.png)
 
-![IMagen](images/imagen_sq1.jpg)
+![Imagen_sq2](images/imagen_sq1.png)
+
+
+### 3. Evidencia de JFrog Artifactory
+
+**Capturas requeridas:**
+- Contenedores activos mediante comando `docker compose ps` en el directorio `artifactory/`.
+![Imagen_ar1](images/imagen_ar1.png)
 
 
 ---
