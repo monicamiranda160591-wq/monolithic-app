@@ -255,9 +255,9 @@ mvn clean verify
 ```
 
 **Capturas requeridas:**
-![alt text](image1.png)
 
-![alt text](image-2.png)
+![IMagen](images/imagen1.jpg)
+![IMagen](images/imagen2.jpg)
 
 ### 2. Evidencia de Análisis Estático (SonarQube)
 
@@ -268,9 +268,9 @@ mvn sonar:sonar \
 ```
 
 **Capturas requeridas:**
-![alt text](image_sq1.png)
+![IMagen](images/imagen_sq1.jpg)
 
-![alt text](image_sq2.png)
+![IMagen](images/imagen_sq1.jpg)
 
 
 ---
