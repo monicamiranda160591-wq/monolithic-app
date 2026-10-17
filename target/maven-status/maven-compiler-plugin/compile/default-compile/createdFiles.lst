@@ -1,5 +1,0 @@
-com\example\productos\model\Producto.class
-com\example\productos\controller\ProductoController.class
-com\example\productos\repository\ProductoRepository.class
-com\example\productos\service\ProductoService.class
-com\example\productos\ProductosApplication.class

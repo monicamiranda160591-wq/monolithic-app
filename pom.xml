@@ -191,26 +191,12 @@
                 </executions>
             </plugin>
 
-            <!-- SonarQube Maven Plugin -->
-            <!--
-                NOTA: La URL del servidor SonarQube y el token se inyectan
-                desde Jenkins mediante variables de entorno:
-                  SONAR_HOST_URL   -> sonar.host.url
-                  SONAR_AUTH_TOKEN -> sonar.login
-                No incluir credenciales aqui.
-            -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>${sonar.version}</version>
             </plugin>
 
-            <!-- Maven Deploy Plugin (publicacion en Artifactory) -->
-            <!--
-                NOTA: Las credenciales de Artifactory se gestionan en
-                settings.xml del agente Jenkins (server id: artifactory).
-                No incluir credenciales aqui.
-            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
@@ -219,14 +205,6 @@
         </plugins>
     </build>
 
-    <!-- ============================= -->
-    <!--  Distribution Management     -->
-    <!-- ============================= -->
-    <!--
-        La URL real de Artifactory se configura en Jenkins mediante:
-          ARTIFACTORY_URL (ej: https://mi-artifactory.empresa.com/artifactory)
-        El servidor 'artifactory' debe estar en settings.xml del agente Jenkins.
-    -->
     <distributionManagement>
         <repository>
             <id>artifactory</id>
